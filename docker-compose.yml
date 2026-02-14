@@ -1,0 +1,93 @@
+# DressCast — flat structure (users, weather, dress_advice, gateway, workers, telegram_bot, mcp_server)
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: dresscast
+      POSTGRES_PASSWORD: dresscast
+      POSTGRES_DB: dresscast
+    ports:
+      - "5432:5432"
+
+  users-service:
+    build: .
+    command: python -m users.main
+    environment:
+      USERS_DATABASE_URL: postgresql+asyncpg://dresscast:dresscast@postgres:5432/dresscast
+      USERS_GRPC_HOST: 0.0.0.0
+      USERS_GRPC_PORT: 50053
+    depends_on:
+      - postgres
+    ports:
+      - "50053:50053"
+
+  weather-service:
+    build: .
+    command: python -m weather.main
+    environment:
+      WEATHER_REDIS_URL: redis://redis:6379/0
+      WEATHER_GRPC_HOST: 0.0.0.0
+      WEATHER_GRPC_PORT: 50051
+    depends_on:
+      - redis
+    ports:
+      - "50051:50051"
+
+  dress-advice-service:
+    build: .
+    command: python -m dress_advice.main
+    environment:
+      DRESS_ADVICE_REDIS_URL: redis://redis:6379/0
+      DRESS_ADVICE_GRPC_HOST: 0.0.0.0
+      DRESS_ADVICE_GRPC_PORT: 50052
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_HTTP_PROXY: ${OPENAI_HTTP_PROXY:-}
+    depends_on:
+      - redis
+    ports:
+      - "50052:50052"
+
+  gateway:
+    build: .
+    command: uvicorn gateway.main:app --host 0.0.0.0 --port 8000
+    environment:
+      GATEWAY_WEATHER_GRPC_ADDR: weather-service:50051
+      GATEWAY_DRESS_ADVICE_GRPC_ADDR: dress-advice-service:50052
+      GATEWAY_USERS_GRPC_ADDR: users-service:50053
+      GATEWAY_HTTP_HOST: 0.0.0.0
+      GATEWAY_HTTP_PORT: 8000
+      GATEWAY_GRPC_HOST: 0.0.0.0
+      GATEWAY_GRPC_PORT: 50050
+    depends_on:
+      - users-service
+      - weather-service
+      - dress-advice-service
+    ports:
+      - "8000:8000"
+      - "50050:50050"
+
+  scheduler:
+    build: .
+    command: python -m workers.scheduler.main
+    environment:
+      SCHEDULER_USERS_GRPC_ADDR: users-service:50053
+      SCHEDULER_WEATHER_GRPC_ADDR: weather-service:50051
+    depends_on:
+      - users-service
+      - weather-service
+
+  telegram-bot:
+    build: .
+    # Без TELEGRAM_BOT_TOKEN бот не запускается, контейнер остаётся живым (sleep), остальные сервисы работают
+    command: sh -c "if [ -n \"$$TELEGRAM_BOT_TOKEN\" ]; then exec python -m telegram_bot.main; else echo 'TELEGRAM_BOT_TOKEN not set, bot disabled'; exec sleep infinity; fi"
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      GATEWAY_GRPC_ADDR: gateway:50050
+    depends_on:
+      - gateway
+    restart: on-failure

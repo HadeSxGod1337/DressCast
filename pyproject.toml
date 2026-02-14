@@ -1,0 +1,95 @@
+[tool.poetry]
+name = "dresscast"
+version = "0.1.0"
+description = "Weather + dress advice microservices (FastAPI, gRPC, Redis, Postgres)"
+readme = "README.md"
+authors = []
+packages = []
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = ">=0.109.0"
+uvicorn = {extras = ["standard"], version = ">=0.27.0"}
+grpcio = ">=1.60.0"
+grpcio-tools = ">=1.60.0"
+protobuf = ">=4.25.0"
+sqlalchemy = ">=2.0.0"
+aiosqlite = ">=0.19.0"
+asyncpg = ">=0.29.0"
+redis = ">=5.0.0"
+httpx = ">=0.26.0"
+openai = ">=1.12.0"
+python-telegram-bot = ">=21.0"
+mcp = ">=1.0.0"
+pydantic = ">=2.0.0"
+pydantic-settings = ">=2.0.0"
+pyjwt = {extras = ["crypto"], version = ">=2.8.0"}
+bcrypt = ">=4.0.0"
+pytest = ">=7.4.0"
+pytest-asyncio = ">=0.23.0"
+pytest-cov = ">=4.1.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = ">=0.4.0"
+bandit = {extras = ["toml"], version = ">=1.7.0"}
+pre-commit = ">=3.6.0"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+exclude = ["proto_gen", ".git", "__pycache__", "venv", ".venv"]
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "W",
+    "F",
+    "I",
+    "B",
+    "C4",
+    "UP",
+    "ARG",
+    "SIM",
+]
+ignore = [
+    "E501",
+    "B008",
+    "ARG001",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"dress_advice/api/servicer.py" = ["E402"]
+"dress_advice/main.py" = ["E402"]
+"gateway/api/grpc/servicer.py" = ["E402"]
+"gateway/api/v1/auth.py" = ["E402"]
+"gateway/api/v1/routes.py" = ["E402"]
+"gateway/infrastructure/grpc_clients/clients.py" = ["E402"]
+"gateway/main.py" = ["E402"]
+"mcp_server/gateway_client.py" = ["E402"]
+"mcp_server/main.py" = ["E402"]
+"telegram_bot/gateway_client.py" = ["E402"]
+"telegram_bot/main.py" = ["E402"]
+"users/api/servicer.py" = ["E402"]
+"users/main.py" = ["E402"]
+"weather/api/servicer.py" = ["E402"]
+"weather/main.py" = ["E402"]
+"workers/scheduler/clients.py" = ["E402"]
+"workers/scheduler/job.py" = ["E402"]
+"workers/scheduler/main.py" = ["E402"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["proto_gen", "shared", "gateway", "users", "weather", "dress_advice", "workers", "mcp_server", "telegram_bot", "scripts"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.bandit]
+exclude_dirs = ["proto_gen", "venv", ".venv", "tests/fixtures"]
+skips = ["B101"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+filterwarnings = ["ignore::DeprecationWarning"]

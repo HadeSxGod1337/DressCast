@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package dresscast.v1;
+
+import "common.proto";
+
+service DressAdviceService {
+  rpc GetAdvice(GetAdviceRequest) returns (GetAdviceResponse);
+}
+
+message GetAdviceRequest {
+  WeatherData weather_data = 1;
+  string locale = 2;
+}
+
+message GetAdviceResponse {
+  string advice_text = 1;
+}

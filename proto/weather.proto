@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package dresscast.v1;
+
+import "common.proto";
+
+service WeatherService {
+  rpc GetCurrentWeather(GetCurrentWeatherRequest) returns (WeatherData);
+  rpc GetForecast(GetForecastRequest) returns (GetForecastResponse);
+  rpc RefreshForecasts(RefreshForecastsRequest) returns (RefreshForecastsResponse);
+}
+
+message GetCurrentWeatherRequest {
+  double lat = 1;
+  double lon = 2;
+}
+
+message GetForecastRequest {
+  double lat = 1;
+  double lon = 2;
+  string date = 3;
+  string time = 4;
+}
+
+message GetForecastResponse {
+  WeatherData data = 1;
+}
+
+message RefreshForecastsRequest {
+  repeated Coordinate coords = 1;
+}
+
+message RefreshForecastsResponse {
+  int32 refreshed_count = 1;
+}

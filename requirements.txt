@@ -1,0 +1,2 @@
+# Dependencies are managed by Poetry. See pyproject.toml.
+# Export for Docker/CI: poetry export -f requirements.txt --without-hashes

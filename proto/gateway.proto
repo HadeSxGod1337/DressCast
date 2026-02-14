@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package dresscast.v1;
+
+import "common.proto";
+
+service GatewayService {
+  rpc GetForecast(GatewayForecastRequest) returns (GatewayForecastResponse);
+  rpc GetDressAdvice(GetDressAdviceRequest) returns (GetDressAdviceResponse);
+  rpc ListUserCities(ListUserCitiesRequest) returns (ListUserCitiesResponse);
+  rpc AddCity(AddCityGatewayRequest) returns (City);
+  rpc GetOrCreateUserByTelegramId(GetOrCreateUserByTelegramIdGatewayRequest) returns (User);
+}
+
+message GatewayForecastRequest {
+  int32 user_id = 1;
+  string city_name = 2;
+  string date = 3;
+  string time = 4;
+}
+
+message GatewayForecastResponse {
+  WeatherData weather_data = 1;
+}
+
+message GetDressAdviceRequest {
+  int32 user_id = 1;
+  string city_name = 2;
+  string date = 3;
+  string time = 4;
+  string locale = 5;
+}
+
+message GetDressAdviceResponse {
+  string advice_text = 1;
+}
+
+message ListUserCitiesRequest {
+  int32 user_id = 1;
+}
+
+message ListUserCitiesResponse {
+  repeated City cities = 1;
+}
+
+message AddCityGatewayRequest {
+  int32 user_id = 1;
+  string name = 2;
+  double lat = 3;
+  double lon = 4;
+}
+
+message GetOrCreateUserByTelegramIdGatewayRequest {
+  string telegram_id = 1;
+  string username = 2;
+  string locale = 3;
+}

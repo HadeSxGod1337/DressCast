@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package dresscast.v1;
+
+import "common.proto";
+
+service UsersService {
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc GetUserByUsername(GetUserByUsernameRequest) returns (User);
+  rpc GetUserById(GetUserByIdRequest) returns (User);
+  rpc AddCity(AddCityRequest) returns (City);
+  rpc ListCities(ListCitiesRequest) returns (ListCitiesResponse);
+  rpc GetCity(GetCityRequest) returns (City);
+  rpc GetOrCreateUserByTelegramId(GetOrCreateUserByTelegramIdRequest) returns (User);
+  rpc ListAllCoordinates(ListAllCoordinatesRequest) returns (ListAllCoordinatesResponse);
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string password_hash = 2;
+}
+
+message CreateUserResponse {
+  User user = 1;
+}
+
+message GetUserByUsernameRequest {
+  string username = 1;
+}
+
+message GetUserByIdRequest {
+  int32 user_id = 1;
+}
+
+message AddCityRequest {
+  int32 user_id = 1;
+  string name = 2;
+  double lat = 3;
+  double lon = 4;
+}
+
+message ListCitiesRequest {
+  int32 user_id = 1;
+}
+
+message ListCitiesResponse {
+  repeated City cities = 1;
+}
+
+message GetCityRequest {
+  int32 user_id = 1;
+  string city_name = 2;
+}
+
+message GetOrCreateUserByTelegramIdRequest {
+  string telegram_id = 1;
+  string username = 2;
+  string locale = 3;
+}
+
+message ListAllCoordinatesRequest {}
+
+message CoordWithUserId {
+  int32 user_id = 1;
+  double lat = 2;
+  double lon = 3;
+}
+
+message ListAllCoordinatesResponse {
+  repeated CoordWithUserId coords = 1;
+}

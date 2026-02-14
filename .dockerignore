@@ -1,0 +1,17 @@
+.venv
+venv
+__pycache__
+.git
+.pytest_cache
+.ruff_cache
+*.pyc
+.env
+.env.*
+*.db
+*.sqlite
+.poetry
+htmlcov
+.coverage
+*.egg-info
+.idea
+.vscode
